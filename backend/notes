@@ -1,0 +1,71 @@
+Here’s a summary discussion of **how we achieved the Tier 2 backend task**, including **blockers** we encountered and the **workarounds** used to resolve them:
+
+---
+
+### ✅ **What We Built**
+
+We successfully created a **REST API** using **Node.js + Express + TypeScript** that:
+
+1. Accepts an Ethereum address as a query parameter.
+2. Uses **`ethers.js`** and **Alchemy** to:
+
+   - Fetch the **current gas price**
+   - Get the **latest Ethereum block number**
+   - Retrieve the **ETH balance** of the given address
+
+3. Returns the data in a structured **JSON** response.
+4. Is organized into **modular routes and services**, enabling future extensibility.
+
+---
+
+### ⚙️ **How We Achieved It**
+
+#### ✅ **1. Project Setup**
+
+- Created a backend folder inside the React project directory.
+- Initialized with TypeScript and necessary dependencies:
+
+  - `express`, `ethers`, `dotenv`
+  - TypeScript and dev tools like `ts-node`, `nodemon`, `@types/express`
+
+#### ✅ **2. Clean Code Structure**
+
+- `src/routes/ethereum.ts` – route handler
+- `src/services/ethereumService.ts` – blockchain logic
+- `src/app.ts` – app config
+- `src/server.ts` – server entry point
+
+#### ✅ **3. Blockchain Integration**
+
+- Used `ethers.JsonRpcProvider` with Alchemy RPC URL to interact with the Ethereum network.
+- Retrieved:
+
+  - Gas price → `getGasPrice()`
+  - Block number → `getBlockNumber()`
+  - Balance → `getBalance(address)`
+
+#### ✅ **4. Environment Config**
+
+- Created a `.env` file to store the `ALCHEMY_URL` securely.
+- Loaded via `dotenv.config()`.
+
+---
+
+### ❌ **Blockers & Workarounds**
+
+| Blocker                                  | Explanation                                                                | Workaround                                                                      |
+| ---------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 🧩 **Ethers v6 method mismatch**         | Many methods like `ethers.isAddress`, `formatEther`, etc. caused TS errors | We downgraded to **ethers v5** to match the exam requirements                   |
+| 🔗 **Missing ESM module support**        | TypeScript with ESNext caused module resolution errors in Node.js          | Updated `tsconfig.json`: `"module": "NodeNext", "moduleResolution": "NodeNext"` |
+| ⚠️ **Module not found after build**      | Errors like `Cannot find module dist/app.js`                               | Ensured all source files were compiled and `paths` resolved correctly           |
+| 🔑 **Alchemy/etherscan key not loading** | `process.env.ALCHEMY_URL` returned `undefined`                             | Verified `.env` was in the right place and used `dotenv` early in code          |
+| 🚫 **404 error on hitting endpoint**     | Server returned "Cannot GET /api/ethereum"                                 | Ensured correct route, method (GET), and base URL `/api/ethereum`               |
+
+---
+
+### 🔄 **Future Extensibility**
+
+- Code is modular with clear separation of concerns:
+
+  - API logic in `routes/`
+  - Blockchain logic in `services/`

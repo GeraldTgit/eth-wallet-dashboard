@@ -1,4 +1,4 @@
-````markdown
+```markdown
 # Ethereum Wallet Dashboard Backend
 
 ## Overview
@@ -29,14 +29,14 @@ The API is built with FastAPI and supports async calls to provide efficient resp
 ---
 
 ## Setup and Running Locally
+```
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd <your-project-directory>
+git clone https://github.com/GeraldTgit/eth-wallet-dashboard.git
+cd <your-project-directory>/backend
 ```
-````
 
 ### 2. Create and Activate a Python Virtual Environment
 

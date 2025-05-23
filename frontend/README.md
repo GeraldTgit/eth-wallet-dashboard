@@ -18,8 +18,8 @@ It uses **ethers.js v5** for blockchain interactions and connects to the Ethereu
 1. **Clone the repository:**
 
    ```bash
-   git clone <your-repo-url>
-   cd <your-frontend-folder>
+   git clone https://github.com/GeraldTgit/eth-wallet-dashboard.git
+   cd <your-project-directory>/frontend
    ```
 
 2. **Install dependencies:**

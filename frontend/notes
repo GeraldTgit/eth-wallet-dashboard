@@ -1,0 +1,193 @@
+This is a TypeScript + React component that allows a user to **connect their MetaMask wallet**, fetches their **ETH balance**, and displays their **last 10 Ethereum transactions** using the `ethers.js` library. Here's a breakdown of how each part works:
+
+---
+
+### 🔗 Imports
+
+```ts
+import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+```
+
+- `useState`: Hook to manage local state (like balance, address, transactions).
+- `ethers`: A library to interact with Ethereum blockchain (read/write data, connect to wallets).
+
+---
+
+### 🌍 Patch `window.ethereum`
+
+```ts
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+```
+
+- TypeScript patch to let TypeScript know that `window.ethereum` might exist (used by MetaMask).
+
+---
+
+### 📦 Define the `Transaction` Interface
+
+```ts
+interface Transaction {
+  hash: string;
+  to?: string;
+  from: string;
+  value: ethers.BigNumber;
+  timeStamp?: string;
+}
+```
+
+- Defines the structure of each transaction we’ll store and show.
+
+---
+
+### ⚙️ Main Component State
+
+```ts
+const [ethBalance, setEthBalance] = useState<string>("");
+const [transactions, setTransactions] = useState<Transaction[]>([]);
+const [walletAddress, setWalletAddress] = useState<string>("");
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState<string>("");
+```
+
+- `ethBalance`: User's ETH balance in string format.
+- `transactions`: List of their last 10 transactions.
+- `walletAddress`: Connected wallet address.
+- `loading`: Show loading state during data fetch.
+- `error`: Store any errors (e.g., no MetaMask or fetch fail).
+
+---
+
+### 🔌 `connectWallet` Function
+
+This is where most logic lives.
+
+```ts
+if (!window.ethereum) {
+  setError("MetaMask is not installed.");
+  return;
+}
+```
+
+- Check if MetaMask is available in the browser.
+
+```ts
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+await provider.send("eth_requestAccounts", []);
+```
+
+- Connect to the user's wallet and request account access.
+
+```ts
+const signer = provider.getSigner();
+const userAddress = await signer.getAddress();
+setWalletAddress(userAddress);
+```
+
+- Get the currently connected wallet address.
+
+```ts
+const balance = await provider.getBalance(userAddress);
+setEthBalance(ethers.utils.formatEther(balance));
+```
+
+- Fetch ETH balance (in wei), then convert to ETH format using `formatEther`.
+
+```ts
+const etherscan = new ethers.providers.EtherscanProvider(
+  "homestead",
+  process.env.REACT_APP_ETHERSCAN_API_KEY
+);
+```
+
+- Set up a provider to access Etherscan API for transaction history.
+- `"homestead"` is the main Ethereum network.
+
+```ts
+const history = await etherscan.getHistory(userAddress);
+const last10 = history.slice(-10).reverse();
+setTransactions(last10 as Transaction[]);
+```
+
+- Fetch full transaction history and take the last 10 transactions, reversed for latest-first display.
+
+```ts
+catch (err: any) {
+  setError(err.message || "Failed to connect wallet.");
+}
+```
+
+- Handle any runtime errors.
+
+---
+
+### 🧱 JSX UI Structure
+
+#### Connect Wallet Button
+
+```ts
+<button onClick={connectWallet}>Connect Wallet</button>
+```
+
+#### Error Display
+
+```ts
+{
+  error && <p>{error}</p>;
+}
+```
+
+#### Wallet Info and Transactions
+
+```ts
+{
+  walletAddress && (
+    <>
+      <p>
+        <strong>Wallet:</strong> {walletAddress}
+      </p>
+      <p>
+        <strong>Balance:</strong> {ethBalance} ETH
+      </p>
+
+      <h2>Last 10 Transactions:</h2>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <ul>
+          {transactions.map((tx) => (
+            <li key={tx.hash}>
+              <a href={`https://etherscan.io/tx/${tx.hash}`} target="_blank">
+                {tx.hash.slice(0, 10)}... → {ethers.utils.formatEther(tx.value)}{" "}
+                ETH
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+```
+
+- Displays wallet address, ETH balance, and a list of clickable transaction hashes with amount.
+
+---
+
+### 🧪 Summary
+
+| Function/Variable                    | Purpose                                                 |
+| ------------------------------------ | ------------------------------------------------------- |
+| `connectWallet`                      | Connect to MetaMask, get address, balance, transactions |
+| `ethBalance`                         | ETH balance as a string                                 |
+| `transactions`                       | Last 10 transactions                                    |
+| `walletAddress`                      | User's Ethereum wallet                                  |
+| `ethers.providers.Web3Provider`      | Connects to MetaMask                                    |
+| `ethers.providers.EtherscanProvider` | Fetches transaction history via API                     |
+| `ethers.utils.formatEther`           | Converts wei to readable ETH                            |
+
+---

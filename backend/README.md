@@ -1,6 +1,6 @@
-```markdown
 # Ethereum Wallet Dashboard Backend
 
+```markdown
 ## Overview
 
 This backend service provides Ethereum wallet information including balance, current gas price, and block number by interacting with the Ethereum blockchain via Alchemy and storing data in a Supabase PostgreSQL database. It uses Redis caching to optimize performance by reducing redundant blockchain calls.
@@ -27,9 +27,9 @@ The API is built with FastAPI and supports async calls to provide efficient resp
 - `pip` for installing Python dependencies
 
 ---
+```
 
 ## Setup and Running Locally
-```
 
 ### 1. Clone the Repository
 
@@ -115,7 +115,6 @@ GET http://127.0.0.1:8000/eth-info?address=0xYourEthereumAddressHere
 
 If the table doesn’t exist yet, create it with:
 
-````markdown
 Make sure your PostgreSQL database table `wallet_balances` includes these columns to store blockchain metadata:
 
 ```sql
@@ -166,4 +165,3 @@ CREATE TABLE wallet_balances (
 - Ethereum address validation is minimal (length only).
 
 ---
-````

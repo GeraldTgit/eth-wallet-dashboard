@@ -81,7 +81,9 @@ REDIS_PASSWORD=""  # leave empty if no password set
 
 ### 5. Start Redis Server (Optional but Recommended)
 
-To run Redis locally for caching, use Docker:
+Run the Docker Desktop application.
+
+Then run Redis locally for caching, use Docker:
 
 ```bash
 docker run -p 6379:6379 redis
@@ -91,7 +93,7 @@ This command starts a Redis container exposing port 6379 on localhost.
 
 ### 6. Run the FastAPI Backend
 
-Start the server with:
+Open a separate Terminal and start the server with:
 
 ```bash
 uvicorn main:app --reload
@@ -113,14 +115,8 @@ GET http://127.0.0.1:8000/eth-info?address=0xYourEthereumAddressHere
 
 If the table doesn’t exist yet, create it with:
 
-Sure! Here’s the updated **Database Schema Changes** section with the additional columns and detailed SQL commands:
-
 ````markdown
-## Database Schema Changes
-
 Make sure your PostgreSQL database table `wallet_balances` includes these columns to store blockchain metadata:
-
-If the table doesn’t exist yet, create it with:
 
 ```sql
 CREATE TABLE wallet_balances (
@@ -135,7 +131,7 @@ CREATE TABLE wallet_balances (
 
 - **block_number**: The current Ethereum block number at the time of balance fetch.
 - **gas_price**: The gas price in wei when the data was fetched (using `NUMERIC` for precision).
-- **timestamp**: Automatically records the time of the balance record insertion with timezone support.
+- **timestamp**: Automatically records the time of the balance record insertion with timezo=ne support.
 
 ---
 

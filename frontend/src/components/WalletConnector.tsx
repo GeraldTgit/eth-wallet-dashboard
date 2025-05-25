@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ethers } from "ethers";
-import contractABI from "../abis/NFTCollection.json";
 
 // Patch the window object type
 declare global {
@@ -38,6 +37,7 @@ const WalletConnector = () => {
   } | null>(null);
   const [gasPrice, setGasPrice] = useState<string>("");
   const [blockNumber, setBlockNumber] = useState<number | null>(null);
+  const [tokens, setTokens] = useState([]);
 
   const fetchBackendData = async (userAddress: string) => {
     try {
@@ -94,65 +94,40 @@ const WalletConnector = () => {
   };
 
   const mintToken = async () => {
+    if (!walletAddress) return;
+
     try {
-      if (!window.ethereum) {
-        setError("MetaMask is not installed.");
-        return;
-      }
-
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const userAddress = await signer.getAddress();
-
-      const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-      if (!contractAddress) {
-        throw new Error("REACT_APP_CONTRACT_ADDRESS is not defined in .env");
-      }
-
-      const contract = new ethers.Contract(
-        contractAddress,
-        contractABI,
-        signer
-      );
-
-      const tokenURI = process.env.REACT_APP_TOKEN_URI;
-
-      const tx = await contract.safeMint(userAddress, tokenURI);
-      await tx.wait();
-      const receipt = await tx.wait();
-
-      // Extract the minted token ID from Transfer event
-      const transferEvent = receipt.events?.find(
-        (e: any) => e.event === "Transfer"
-      );
-
-      if (!transferEvent) throw new Error("Transfer event not found");
-
-      const mintedTokenId = transferEvent.args?.tokenId.toString();
-
-      const owner = await contract.ownerOf(mintedTokenId);
-
-      setLastMintedTokenId(`${mintedTokenId} (owner: ${owner})`);
-
-      // Get the token URI
-      const tokenUri = await contract.tokenURI(mintedTokenId);
-
-      // more reliable public gateway
-      const response = await fetch(tokenUri);
-
-      const metadata = await response.json();
-
-      // Store metadata to display in UI
-      setLastMintedTokenMetadata({
-        image: metadata.image,
-        name: metadata.name,
-        description: metadata.description,
+      const response = await fetch("http://localhost:8000/api/mint-token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address: walletAddress }),
       });
 
-      alert("🎉 Token minted successfully!");
-    } catch (err: any) {
-      console.error("Minting failed:", err);
-      setError(err.message || "Minting failed.");
+      const data = await response.json();
+      if (data.tx_hash) {
+        alert(`Token minted! Tx Hash: ${data.tx_hash}`);
+        // Optional: wait a few seconds for the chain to process, then fetch tokens again
+        setTimeout(() => fetchTokens(walletAddress), 5000);
+      } else {
+        alert("Minting failed.");
+      }
+    } catch (error) {
+      console.error("Mint error:", error);
+      alert("An error occurred while minting.");
+    }
+  };
+
+  const fetchTokens = async (address: string): Promise<void> => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/tokens/${address}`
+      );
+      const data = await response.json();
+      setTokens(data.tokens); // Assume you use a `tokens` state
+    } catch (error) {
+      console.error("Token fetch error:", error);
     }
   };
 
@@ -178,6 +153,17 @@ const WalletConnector = () => {
         <p className="mt-4 text-green-700">
           🎉 Last Minted Token ID: {lastMintedTokenId}
         </p>
+      )}
+
+      {tokens.length > 0 && (
+        <div>
+          <h3>🎉 Your Minted Tokens:</h3>
+          <ul>
+            {tokens.map((id) => (
+              <li key={id}>Token ID: {id}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {walletAddress && (

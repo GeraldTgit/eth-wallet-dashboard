@@ -57,6 +57,8 @@ PRIVATE_KEY=your-wallet-private-key
 ### Compile Contracts
 
 ```bash
+npm install --save-dev hardhat
+
 npx hardhat compile
 ```
 

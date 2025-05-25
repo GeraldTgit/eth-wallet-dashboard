@@ -10,7 +10,7 @@ contract NFTCollection is ERC721URIStorage {
 
     constructor() ERC721("MyNFT", "MNFT") {}
 
-    function mintNFT(address recipient, string memory tokenURI)
+    function safeMint(address recipient, string memory tokenURI)
         public
         returns (uint256)
     {
@@ -21,5 +21,9 @@ contract NFTCollection is ERC721URIStorage {
         _setTokenURI(newItemId, tokenURI);
 
         return newItemId;
+    }
+
+    function nextTokenId() public view returns (uint256) {
+        return _tokenIds.current();
     }
 }

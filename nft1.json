@@ -1,0 +1,9 @@
+{
+  "name": "My First NFT",
+  "description": "This is a sample NFT minted via safeMint function.",
+  "image": "https://gateway.pinata.cloud/ipfs/bafkreignopettccjv4kuimjurrtrxdnvfx2kyvwsfzvzeyzp7pkuvo2w3y", 
+  "attributes": [
+    { "trait_type": "Background", "value": "Blue" },
+    { "trait_type": "Eyes", "value": "Green" }
+  ]
+}

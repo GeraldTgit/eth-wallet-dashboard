@@ -12,9 +12,7 @@
 /build
 .venv/
 **.venv/
-
-# experimental sub folder
-**ethereum-api/
+**__pycache__/
 
 # misc
 .env

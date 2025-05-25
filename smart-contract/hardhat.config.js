@@ -2,6 +2,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
 module.exports = {
+  // To test contract locally, remove below sol
   solidity: "0.8.18",
   networks: {
     sepolia: {

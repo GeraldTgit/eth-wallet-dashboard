@@ -1,7 +1,16 @@
 from fastapi import FastAPI, Query, HTTPException
 from services.eth_service import get_eth_data
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # your frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/eth-info")
 async def eth_info(address: str = Query(..., min_length=42, max_length=42)):

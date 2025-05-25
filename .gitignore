@@ -12,6 +12,7 @@
 /build
 venv/
 **venv/
+**__pycache__/
 
 # misc
 .env

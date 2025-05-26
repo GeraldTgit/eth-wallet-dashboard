@@ -1,13 +1,24 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+const { SEPOLIA_RPC_URL, PRIVATE_KEY } = process.env;
+
 module.exports = {
-  // To test contract locally, remove below sol
-  solidity: "0.8.18",
+  defaultNetwork: "hardhat",
   networks: {
     sepolia: {
-      url: process.env.SEPOLIA_URL,
-      accounts: [process.env.PRIVATE_KEY],
+      url: SEPOLIA_RPC_URL,
+      accounts: [PRIVATE_KEY],
+    },
+    // You can add other networks here
+  },
+  solidity: {
+    version: "0.8.18",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
     },
   },
 };

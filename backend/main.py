@@ -1,11 +1,14 @@
+from typing import Optional
 from fastapi import FastAPI, Query, HTTPException
 from services.eth_service import get_eth_data
 from fastapi.middleware.cors import CORSMiddleware
 from services.contract_service import mint_token
 from pydantic import BaseModel
+import os
 
 class MintRequest(BaseModel):
     address: str
+    network: Optional[str] = "mainnet"
 
 app = FastAPI(debug=True)
 
@@ -36,10 +39,22 @@ async def get_wallet_info(address: str):
 
 @app.post("/api/mint-token")
 async def mint_token_api(request: MintRequest):
-    try:
-        print("⚙️ Starting mint_token for:", request.address)
+    address = request.address
+    network = request.network or "mainnet"
 
-        tx_result = mint_token(request.address)
+    if network == "sepolia":
+        rpc_url = os.getenv("SEPOLIA_RPC_URL")
+        contract_address = os.getenv("CONTRACT_ADDRESS_SEPOLIA")
+    else:
+        rpc_url = os.getenv("MAINNET_RPC_URL")
+        contract_address = os.getenv("CONTRACT_ADDRESS_MAINNET")
+
+    private_key = os.getenv("PRIVATE_KEY")
+
+    try:
+        print("⚙️ Starting mint_token for:", address)
+
+        tx_result = mint_token(address, rpc_url, private_key)
 
         print("✅ Mint result:", tx_result)
 

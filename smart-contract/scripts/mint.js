@@ -2,7 +2,7 @@ const hre = require("hardhat");
 
 async function main() {
   // Use the same address where your contract is deployed
-  const contractAddress = "0x4326be87972fc5b98634f8AF0339224A64dbaB08";
+  const contractAddress = "0x";
 
   // Get the contract factory and attach to deployed address
   const NFT = await hre.ethers.getContractFactory("NFTCollection");

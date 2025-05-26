@@ -38,6 +38,7 @@ const WalletConnector = () => {
   const [gasPrice, setGasPrice] = useState<string>("");
   const [blockNumber, setBlockNumber] = useState<number | null>(null);
   const [tokens, setTokens] = useState([]);
+  const [network, setNetwork] = useState("mainnet");
 
   const fetchBackendData = async (userAddress: string) => {
     try {
@@ -102,7 +103,7 @@ const WalletConnector = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ address: walletAddress }),
+        body: JSON.stringify({ address: walletAddress, network }),
       });
 
       const data = await response.json();
@@ -132,96 +133,103 @@ const WalletConnector = () => {
   };
 
   return (
-    <div className="p-4">
-      <button
-        onClick={connectWallet}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        Connect Wallet
-      </button>
+    <>
+      <select value={network} onChange={(e) => setNetwork(e.target.value)}>
+        <option value="mainnet">Mainnet</option>
+        <option value="sepolia">Sepolia</option>
+      </select>
+      <div className="p-4">
+        <button
+          onClick={connectWallet}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Connect Wallet
+        </button>
 
-      <button
-        onClick={mintToken}
-        className="bg-green-600 text-white px-4 py-2 rounded ml-4"
-      >
-        Mint Token
-      </button>
+        <button
+          onClick={mintToken}
+          className="bg-green-600 text-white px-4 py-2 rounded ml-4"
+        >
+          Mint Token
+        </button>
 
-      {error && <p className="text-red-600 mt-2">{error}</p>}
+        {error && <p className="text-red-600 mt-2">{error}</p>}
 
-      {lastMintedTokenId && (
-        <p className="mt-4 text-green-700">
-          🎉 Last Minted Token ID: {lastMintedTokenId}
-        </p>
-      )}
-
-      {tokens.length > 0 && (
-        <div>
-          <h3>🎉 Your Minted Tokens:</h3>
-          <ul>
-            {tokens.map((id) => (
-              <li key={id}>Token ID: {id}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {walletAddress && (
-        <div className="mt-4">
-          <p>
-            <strong>Wallet:</strong> {walletAddress}
+        {lastMintedTokenId && (
+          <p className="mt-4 text-green-700">
+            🎉 Last Minted Token ID: {lastMintedTokenId}
           </p>
-          <p>
-            <strong>Balance:</strong> {ethBalance} ETH
-          </p>
-          <p>
-            <strong>Gas Price:</strong> {gasPrice}
-          </p>
-          <p>
-            <strong>Block Number:</strong> {blockNumber}
-          </p>
+        )}
 
-          <h2 className="mt-4 font-bold">Last 10 Transactions:</h2>
-          {loading ? (
-            <p>
-              Loading transactions... <br></br>Can only retrieve ETH
-              Transaction, for now.
-            </p>
-          ) : (
-            <ul className="list-disc pl-6 mt-2">
-              {transactions.map((tx) => (
-                <li key={tx.hash}>
-                  <a
-                    href={`https://etherscan.io/tx/${tx.hash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 underline"
-                  >
-                    {tx.hash.slice(0, 10)}... →{" "}
-                    {ethers.utils.formatEther(tx.value)} ETH
-                  </a>
-                </li>
+        {tokens.length > 0 && (
+          <div>
+            <h3>🎉 Your Minted Tokens:</h3>
+            <ul>
+              {tokens.map((id) => (
+                <li key={id}>Token ID: {id}</li>
               ))}
             </ul>
-          )}
-        </div>
-      )}
-      {lastMintedTokenMetadata && (
-        <div className="mt-4 p-4 border rounded bg-gray-50">
-          <img
-            src={lastMintedTokenMetadata.image}
-            alt={lastMintedTokenMetadata.name}
-            className="w-32 h-32 object-cover mb-2 rounded"
-          />
-          <p>
-            <strong>Name:</strong> {lastMintedTokenMetadata.name}
-          </p>
-          <p>
-            <strong>Description:</strong> {lastMintedTokenMetadata.description}
-          </p>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+
+        {walletAddress && (
+          <div className="mt-4">
+            <p>
+              <strong>Wallet:</strong> {walletAddress}
+            </p>
+            <p>
+              <strong>Balance:</strong> {ethBalance} ETH
+            </p>
+            <p>
+              <strong>Gas Price:</strong> {gasPrice}
+            </p>
+            <p>
+              <strong>Block Number:</strong> {blockNumber}
+            </p>
+
+            <h2 className="mt-4 font-bold">Last 10 Transactions:</h2>
+            {loading ? (
+              <p>
+                Loading transactions... <br></br>Can only retrieve ETH
+                Transaction, for now.
+              </p>
+            ) : (
+              <ul className="list-disc pl-6 mt-2">
+                {transactions.map((tx) => (
+                  <li key={tx.hash}>
+                    <a
+                      href={`https://etherscan.io/tx/${tx.hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      {tx.hash.slice(0, 10)}... →{" "}
+                      {ethers.utils.formatEther(tx.value)} ETH
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+        {lastMintedTokenMetadata && (
+          <div className="mt-4 p-4 border rounded bg-gray-50">
+            <img
+              src={lastMintedTokenMetadata.image}
+              alt={lastMintedTokenMetadata.name}
+              className="w-32 h-32 object-cover mb-2 rounded"
+            />
+            <p>
+              <strong>Name:</strong> {lastMintedTokenMetadata.name}
+            </p>
+            <p>
+              <strong>Description:</strong>{" "}
+              {lastMintedTokenMetadata.description}
+            </p>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
